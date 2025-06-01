@@ -14,6 +14,8 @@ using Luftborn.Application.IServices.Interfaces;
 using Luftborn.Application.Settings;
 using Luftborn.Application.Services.Services;
 using Luftborn.API.Middleware;
+using Luftborn.Application.Extensions;
+using Luftborn.Domain.Repositories;
 
 namespace Luftborn
 {
@@ -80,6 +82,7 @@ namespace Luftborn
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddScoped<IArticleRepository, ArticleRepository>();
 
             // Configure JWT Settings
             services.Configure<JwtSettings>(Configuration.GetSection("JwtSettings"));
@@ -104,6 +107,9 @@ namespace Luftborn
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
                 };
             });
+
+            // Register application services with decorators
+            services.AddApplicationServices();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
