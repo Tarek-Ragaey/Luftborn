@@ -28,17 +28,21 @@ namespace Luftborn.Application.Models.Articles
 
     public class CreateArticleDto
     {
+
+        public Dictionary<string, ArticleTranslationContentDto> Translations { get; set; }
+
+        public bool IsPublished { get; set; }
+    }
+
+    public class ArticleTranslationContentDto
+    {
         public string Title { get; set; }
         public string Content { get; set; }
-        public string LanguageKey { get; set; }
-        public bool IsPublished { get; set; }
     }
 
     public class UpdateArticleDto
     {
-        public string Title { get; set; }
-        public string Content { get; set; }
-        public string LanguageKey { get; set; }
+        public Dictionary<string, ArticleTranslationContentDto> Translations { get; set; }
         public bool? IsPublished { get; set; }
     }
 } 

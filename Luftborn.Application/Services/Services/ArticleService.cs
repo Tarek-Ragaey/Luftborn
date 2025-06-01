@@ -6,6 +6,7 @@ using Luftborn.Application.IServices.Interfaces;
 using Luftborn.Application.Models.Articles;
 using Luftborn.Domain.Entites;
 using Luftborn.Domain.Repositories;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Luftborn.Application.Services.Services
 {
@@ -41,20 +42,21 @@ namespace Luftborn.Application.Services.Services
             var article = new Article
             {
                 WriterId = writerId,
-                IsPublished = createArticleDto.IsPublished,
-                Translations = new List<ArticleTranslation>
-                {
-                    new ArticleTranslation
-                    {
-                        Title = createArticleDto.Title,
-                        Content = createArticleDto.Content,
-                        LanguageKey = createArticleDto.LanguageKey
-                    }
-                }
+                IsPublished = createArticleDto.IsPublished
             };
+           foreach (var translation in createArticleDto.Translations)
+            {
+                article.Translations.Add(new ArticleTranslation
+                {
+                    Title = translation.Value.Title,
+                    Content = translation.Value.Content,
+                    LanguageKey = translation.Key,
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
 
             article = await _articleRepository.CreateArticleAsync(article);
-            return MapToArticleDto(article, createArticleDto.LanguageKey);
+            return MapToArticleDto(article);
         }
 
         public async Task<ArticleDto> UpdateArticleAsync(int id, UpdateArticleDto updateArticleDto)
@@ -68,25 +70,22 @@ namespace Luftborn.Application.Services.Services
                 article.IsPublished = updateArticleDto.IsPublished.Value;
             }
 
-            var translation = await _articleRepository.GetArticleTranslationAsync(id, updateArticleDto.LanguageKey);
-            if (translation == null)
+            article.Translations = new List<ArticleTranslation>();
+            foreach (var translation in updateArticleDto.Translations)
             {
-                translation = new ArticleTranslation
+                article.Translations.Add(new ArticleTranslation
                 {
-                    ArticleId = id,
-                    LanguageKey = updateArticleDto.LanguageKey
-                };
-                article.Translations.Add(translation);
+                    Title = translation.Value.Title,
+                    Content = translation.Value.Content,
+                    LanguageKey = translation.Key,
+                    CreatedAt = DateTime.UtcNow
+                });
             }
-
-            translation.Title = updateArticleDto.Title ?? translation.Title;
-            translation.Content = updateArticleDto.Content ?? translation.Content;
-            translation.UpdatedAt = DateTime.UtcNow;
 
             article.UpdatedAt = DateTime.UtcNow;
             
             article = await _articleRepository.UpdateArticleAsync(article);
-            return MapToArticleDto(article, updateArticleDto.LanguageKey);
+            return MapToArticleDto(article);
         }
 
         public async Task<bool> DeleteArticleAsync(int id)
@@ -94,9 +93,11 @@ namespace Luftborn.Application.Services.Services
             return await _articleRepository.DeleteArticleAsync(id);
         }
 
-        private ArticleDto MapToArticleDto(Article article, string languageKey)
+        private ArticleDto MapToArticleDto(Article article, string languageKey = null)
         {
-            var currentTranslation = article.Translations
+            ArticleTranslation currentTranslation = null;
+            if (!languageKey.IsNullOrEmpty())
+             currentTranslation = article.Translations
                 .FirstOrDefault(t => t.LanguageKey == languageKey);
 
             return new ArticleDto
