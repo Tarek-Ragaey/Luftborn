@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Luftborn.API.Controllers
 {
-    [Authorize(Roles = Roles.SuperAdmin)]
+    [Authorize(Roles = "Super Admin")]
     [ApiController]
     [Route("api/[controller]")]
     public class UserController : ControllerBase

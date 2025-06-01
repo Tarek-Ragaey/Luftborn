@@ -15,7 +15,7 @@ namespace Luftborn.Task.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = Roles.SuperAdminOrWriter)]
+    [Authorize(Roles = "User,Writer,Super Admin")]
     public class ArticleController : ControllerBase
     {
         private readonly IArticleService _articleService;
@@ -35,7 +35,7 @@ namespace Luftborn.Task.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<ArticleDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [Authorize(Roles = Roles.AllRoles)]
+        [Authorize(Roles = "User,Writer,Super Admin")]
 
         public async Task<IActionResult> GetArticles([FromQuery] PaginationParams paginationParams)
         {
@@ -71,6 +71,8 @@ namespace Luftborn.Task.Controllers
         [Authorize]
         [ProducesResponseType(typeof(IEnumerable<ArticleDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [Authorize(Roles = "Writer,Super Admin")]
+
         public async Task<IActionResult> GetMyArticles([FromQuery] PaginationParams paginationParams)
         {
             var writerId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -107,6 +109,8 @@ namespace Luftborn.Task.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Authorize(Roles = Roles.AllRoles)]
 
+        [Authorize(Roles = "User,Writer,Super Admin")]
+
         public async Task<IActionResult> GetArticle(int id)
         {
             var languageKey = HttpContext.Items["LanguageKey"]?.ToString() ?? "en";
@@ -131,6 +135,8 @@ namespace Luftborn.Task.Controllers
         [ProducesResponseType(typeof(ArticleDto), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [Authorize(Roles = "Writer,Super Admin")]
+
         public async Task<IActionResult> CreateArticle([FromBody] CreateArticleDto createArticleDto)
         {
             var writerId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -152,6 +158,8 @@ namespace Luftborn.Task.Controllers
         [ProducesResponseType(typeof(ArticleDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [Authorize(Roles = "Writer,Super Admin")]
+
         public async Task<IActionResult> UpdateArticle(int id, [FromBody] UpdateArticleDto updateArticleDto)
         {
             var article = await _articleService.UpdateArticleAsync(id, updateArticleDto);
@@ -175,6 +183,8 @@ namespace Luftborn.Task.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [Authorize(Roles = "Writer,Super Admin")]
+
         public async Task<IActionResult> DeleteArticle(int id)
         {
             var result = await _articleService.DeleteArticleAsync(id);
