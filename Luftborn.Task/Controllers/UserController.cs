@@ -1,0 +1,86 @@
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Luftborn.Application.IServices.Extensions;
+using Luftborn.Application.IServices.Interfaces;
+using Luftborn.Application.IServices.Models;
+using Luftborn.Application.IServices.Models.Common;
+using System;
+using System.Threading.Tasks;
+
+namespace Luftborn.API.Controllers
+{
+    [Authorize(Roles = "Admin,Super Admin")]
+    [ApiController]
+    [Route("api/[controller]")]
+    public class UserController : ControllerBase
+    {
+        private readonly IUserService _userService;
+
+        public UserController(IUserService userService)
+        {
+            _userService = userService;
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Super Admin")]
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserModel model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new { Message = "Invalid model state" });
+
+            var (result, user) = await _userService.CreateUserAsync(model);
+            if (result.Succeeded)
+                return Ok(new { Message = "User created successfully", User = user });
+
+            return BadRequest(new { Message = string.Join(", ", result.Errors.Select(e => e.Description)) });
+        }
+
+        /// <summary>
+        /// Gets all users with pagination and their roles
+        /// </summary>
+        [HttpGet]
+        [Authorize(Roles = "Super Admin")]
+        [ProducesResponseType(typeof(IEnumerable<UserListDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> GetAllUsers([FromQuery] PaginationParams paginationParams)
+        {
+            // Get language from HttpContext.Items (set by middleware)
+            paginationParams.LanguageKey = HttpContext.Items["LanguageKey"]?.ToString() ?? "en";
+
+            var (users, totalCount) = await _userService.GetAllUsersAsync(paginationParams);
+
+            var paginationHeader = new PaginationHeader(
+                paginationParams.PageNumber,
+                paginationParams.PageSize,
+                totalCount,
+                (int)Math.Ceiling(totalCount / (double)paginationParams.PageSize)
+            );
+
+            Response.AddPaginationHeader(paginationHeader);
+
+            return Ok(users);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUser(string id)
+        {
+            var (user, roles) = await _userService.GetUserByIdAsync(id);
+            if (user == null)
+                return NotFound(new { Message = "User not found" });
+
+            return Ok(new { user.Id, user.UserName, user.Email, Roles = roles });
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            var result = await _userService.DeleteUserAsync(id);
+            if (result.Succeeded)
+                return Ok(new { Message = "User deleted successfully" });
+
+            return BadRequest(new { Message = string.Join(", ", result.Errors.Select(e => e.Description)) });
+        }
+    }
+}
