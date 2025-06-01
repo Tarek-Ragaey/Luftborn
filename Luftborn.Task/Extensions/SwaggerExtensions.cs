@@ -27,13 +27,12 @@ namespace Luftborn.Task.Extensions
                 // Add JWT Authentication
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
-                    Description = @"JWT Authorization header using the Bearer scheme.
-                        Enter 'Bearer' [space] and then your token in the text input below.
-                        Example: 'Bearer 12345abcdef'",
+                    Description = "JWT Authorization header using the Bearer scheme. Example: 'Bearer {token}'",
                     Name = "Authorization",
                     In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.ApiKey,
-                    Scheme = "Bearer"
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT"
                 });
 
                 options.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -45,12 +44,9 @@ namespace Luftborn.Task.Extensions
                             {
                                 Type = ReferenceType.SecurityScheme,
                                 Id = "Bearer"
-                            },
-                            Scheme = "oauth2",
-                            Name = "Bearer",
-                            In = ParameterLocation.Header
+                            }
                         },
-                        new List<string>()
+                        Array.Empty<string>()
                     }
                 });
 
@@ -68,7 +64,11 @@ namespace Luftborn.Task.Extensions
 
         public static IApplicationBuilder UseSwaggerConfiguration(this IApplicationBuilder app)
         {
-            app.UseSwagger();
+            app.UseSwagger(c =>
+            {
+                c.SerializeAsV2 = false;
+            });
+            
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Luftborn API v1");
@@ -76,6 +76,8 @@ namespace Luftborn.Task.Extensions
                 c.DefaultModelsExpandDepth(-1); // Hide schemas section
                 c.EnableDeepLinking();
                 c.DisplayRequestDuration();
+                // Ensure proper OAuth2/JWT flow
+                c.ConfigObject.AdditionalItems["persistAuthorization"] = true;
             });
 
             return app;
