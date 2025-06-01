@@ -12,7 +12,7 @@ namespace Luftborn.API.Middleware
             _next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context)
+        public async System.Threading.Tasks.Task InvokeAsync(HttpContext context)
         {
             // Check if there's a language in the query parameters
             var paginationParams = context.Request.Query.ContainsKey("languageKey")

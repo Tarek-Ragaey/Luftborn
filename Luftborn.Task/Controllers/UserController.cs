@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Luftborn.API.Controllers
 {
-    [Authorize(Roles = "Admin,Super Admin")]
+    [Authorize(Roles = "Super Admin")]
     [ApiController]
     [Route("api/[controller]")]
     public class UserController : ControllerBase
@@ -23,7 +23,6 @@ namespace Luftborn.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Super Admin")]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserModel model)
         {
             if (!ModelState.IsValid)
@@ -40,7 +39,6 @@ namespace Luftborn.API.Controllers
         /// Gets all users with pagination and their roles
         /// </summary>
         [HttpGet]
-        [Authorize(Roles = "Super Admin")]
         [ProducesResponseType(typeof(IEnumerable<UserListDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]

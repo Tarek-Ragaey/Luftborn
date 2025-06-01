@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Luftborn.Domain.Entites;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Luftborn.Domain.Entites;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,8 @@ namespace Luftborn.Domain
         public DbSet<RoleTranslation> RoleTranslations { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 
-
+        public DbSet<Article> Articles { get; set; }
+        public DbSet<ArticleTranslation> ArticleTranslations { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -45,6 +47,38 @@ namespace Luftborn.Domain
             modelBuilder.Entity<RefreshToken>()
                 .HasIndex(rt => rt.Token)
                 .IsUnique();
+
+            // Configure Article entity
+            modelBuilder.Entity<Article>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                // Configure relationship with Writer (IdentityUser)
+                entity.HasOne(e => e.Writer)
+                    .WithMany()
+                    .HasForeignKey(e => e.WriterId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                // Configure relationship with ArticleTranslations
+                entity.HasMany(e => e.Translations)
+                    .WithOne(e => e.Article)
+                    .HasForeignKey(e => e.ArticleId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Configure ArticleTranslation entity
+            modelBuilder.Entity<ArticleTranslation>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                // Add unique constraint for ArticleId and LanguageKey combination
+                entity.HasIndex(e => new { e.ArticleId, e.LanguageKey }).IsUnique();
+
+                // Configure required fields
+                entity.Property(e => e.Title).IsRequired();
+                entity.Property(e => e.Content).IsRequired();
+                entity.Property(e => e.LanguageKey).IsRequired().HasMaxLength(10);
+            });
         }
     }
 }

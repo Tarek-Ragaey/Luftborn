@@ -8,7 +8,7 @@ using Luftborn.Application.IServices.Models.Common;
 
 namespace Luftborn.API.Controllers
 {
-    [Authorize(Roles = "Admin,Super Admin")]
+    [Authorize(Roles = "Super Admin")]
     [ApiController]
     [Route("api/[controller]")]
     public class RoleController : ControllerBase
