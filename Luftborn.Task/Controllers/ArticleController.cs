@@ -6,6 +6,7 @@ using Luftborn.Application.IServices.Models.Common;
 using Luftborn.Application.IServices.Extensions;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Luftborn.API.Constants;
 
 namespace Luftborn.Task.Controllers
 {
@@ -14,7 +15,7 @@ namespace Luftborn.Task.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "Writer,Super Admin")]
+    [Authorize(Roles = Roles.SuperAdminOrWriter)]
     public class ArticleController : ControllerBase
     {
         private readonly IArticleService _articleService;
@@ -34,6 +35,8 @@ namespace Luftborn.Task.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<ArticleDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = Roles.AllRoles)]
+
         public async Task<IActionResult> GetArticles([FromQuery] PaginationParams paginationParams)
         {
             // Get language from HttpContext.Items (set by middleware)
@@ -102,6 +105,8 @@ namespace Luftborn.Task.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(ArticleDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize(Roles = Roles.AllRoles)]
+
         public async Task<IActionResult> GetArticle(int id)
         {
             var languageKey = HttpContext.Items["LanguageKey"]?.ToString() ?? "en";

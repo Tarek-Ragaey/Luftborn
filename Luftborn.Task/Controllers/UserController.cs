@@ -1,16 +1,17 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Luftborn.API.Constants;
 using Luftborn.Application.IServices.Extensions;
 using Luftborn.Application.IServices.Interfaces;
 using Luftborn.Application.IServices.Models;
 using Luftborn.Application.IServices.Models.Common;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 
 namespace Luftborn.API.Controllers
 {
-    [Authorize(Roles = "Super Admin")]
+    [Authorize(Roles = Roles.SuperAdmin)]
     [ApiController]
     [Route("api/[controller]")]
     public class UserController : ControllerBase

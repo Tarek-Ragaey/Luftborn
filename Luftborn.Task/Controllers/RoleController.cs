@@ -5,10 +5,11 @@ using Luftborn.Application.IServices.Extensions;
 using Luftborn.Application.IServices.Interfaces;
 using Luftborn.Application.IServices.Models;
 using Luftborn.Application.IServices.Models.Common;
+using Luftborn.API.Constants;
 
 namespace Luftborn.API.Controllers
 {
-    [Authorize(Roles = "Super Admin")]
+    [Authorize(Roles = Roles.SuperAdmin)]
     [ApiController]
     [Route("api/[controller]")]
     public class RoleController : ControllerBase
