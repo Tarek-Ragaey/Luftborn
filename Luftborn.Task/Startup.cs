@@ -16,6 +16,9 @@ using Luftborn.Application.Services.Services;
 using Luftborn.API.Middleware;
 using Luftborn.Application.Extensions;
 using Luftborn.Domain.Repositories;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
+using Luftborn.Task.Extensions;
 
 namespace Luftborn
 {
@@ -49,8 +52,9 @@ namespace Luftborn
             });
 
             services.AddControllers();
-            services.AddEndpointsApiExplorer();
-            services.AddSwaggerGen();
+            
+            // Add Swagger configuration
+            services.AddSwaggerConfiguration();
 
             // Configure DbContext
             services.AddDbContext<ApplicationDbContext>(options =>
@@ -77,12 +81,15 @@ namespace Luftborn
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
+            // Register repositories and services
+            services.AddScoped<IArticleRepository, ArticleRepository>();
+            services.AddApplicationServices();
+
             // Register services
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
-            services.AddScoped<IArticleRepository, ArticleRepository>();
 
             // Configure JWT Settings
             services.Configure<JwtSettings>(Configuration.GetSection("JwtSettings"));
@@ -107,18 +114,14 @@ namespace Luftborn
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
                 };
             });
-
-            // Register application services with decorators
-            services.AddApplicationServices();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
                 app.UseDeveloperExceptionPage();
+                app.UseSwaggerConfiguration();
             }
 
             app.UseHttpsRedirection();
