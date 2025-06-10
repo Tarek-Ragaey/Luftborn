@@ -27,7 +27,7 @@ const ArticleDetails: React.FC = () => {
 
     const isWriter = user?.roles.includes('Writer');
     const isSuperAdmin = user?.roles.includes('SuperAdmin');
-    const canEdit = (isWriter && article?.writerId === user?.id) || isSuperAdmin;
+    const canEdit = (isWriter && article?.writerId === user?.userId) || isSuperAdmin;
 
     useEffect(() => {
         if (id) {
@@ -46,7 +46,7 @@ const ArticleDetails: React.FC = () => {
 
     const getTranslation = (translations: Translation[] | undefined): Translation | null => {
         if (!translations || translations.length === 0) return null;
-        return translations.find(t => t.languageKey === selectedLanguage) || translations[0];
+        return translations.find(t => t.languageKey === selectedLanguage) ?? translations[0] ?? null;
     };
 
     if (isLoading) {

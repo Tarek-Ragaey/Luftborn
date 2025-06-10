@@ -1,5 +1,5 @@
 import api from './api';
-import type { Article, CreateArticle, UpdateArticle } from '../types/article';
+import type {  CreateArticle, UpdateArticle } from '../types/article';
 
 export const getArticles = async (page: number = 1, pageSize: number = 10) => {
     const response = await api.get(`/article?pageNumber=${page}&pageSize=${pageSize}`);

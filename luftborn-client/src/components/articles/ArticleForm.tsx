@@ -14,7 +14,6 @@ import {
 } from '@mui/material';
 import type { AppDispatch, RootState } from '../../store/store';
 import { createArticle, updateArticle, fetchArticle } from '../../store/articleSlice';
-import type { Article } from '../../types/article';
 
 interface ArticleFormProps {
     mode?: 'create' | 'edit' | 'view';

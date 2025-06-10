@@ -25,8 +25,6 @@ const Navigation: React.FC = () => {
     if (!user) return null;
 
     const isSuperAdmin = user.roles.includes('Super Admin');
-    const canCreateArticle = user.roles.includes('Writer') || user.roles.includes('Super Admin');
-
     return (
         <AppBar position="static">
             <Toolbar>

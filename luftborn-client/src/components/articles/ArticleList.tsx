@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
     Box,
-    Grid,
     Card,
     CardContent,
     Typography,
@@ -85,9 +84,9 @@ const ArticleList: React.FC = () => {
                 </Alert>
             )}
 
-            <Grid container spacing={2}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 2 }}>
                 {articles.map((article) => (
-                    <Grid item xs={12} sm={6} md={4} key={article.id}>
+                    <Box key={article.id}>
                         <Card>
                             <CardContent>
                                 <Typography variant="h6" component="h2" gutterBottom>
@@ -133,9 +132,9 @@ const ArticleList: React.FC = () => {
                                 )}
                             </CardActions>
                         </Card>
-                    </Grid>
+                    </Box>
                 ))}
-            </Grid>
+            </Box>
 
             {articles.length === 0 && !error && (
                 <Alert severity="info">No articles found.</Alert>

@@ -1,5 +1,5 @@
 import api from './api';
-import type { User, CreateUser, UpdateUser } from '../types/user';
+import type { CreateUser, UpdateUser } from '../types/user';
 
 export const getUsers = async (page: number = 1, pageSize: number = 10) => {
     const response = await api.get(`/user?pageNumber=${page}&pageSize=${pageSize}`);

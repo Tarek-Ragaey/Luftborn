@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Container, CssBaseline, ThemeProvider } from '@mui/material';
 import { theme } from './theme';
 import LoginForm from './components/auth/LoginForm';
